@@ -11,6 +11,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // The tutorial can be found just here on the SSaurel's Blog : 
 // https://www.ssaurel.com/blog/create-a-simple-http-web-server-in-java
@@ -21,6 +23,7 @@ public class JavaHTTPServer implements Runnable{
 	static final String DEFAULT_FILE = "index.html";
 	static final String FILE_NOT_FOUND = "404.html";
 	static final String METHOD_NOT_SUPPORTED = "not_supported.html";
+        static boolean a=false;
 	// port to listen connection
 	static final int PORT = 8080;
 	
@@ -60,6 +63,7 @@ public class JavaHTTPServer implements Runnable{
 	@Override
 	public void run() {
 		// we manage our particular client connection
+               
 		BufferedReader in = null; PrintWriter out = null; BufferedOutputStream dataOut = null;
 		String fileRequested = null;
 		
@@ -74,7 +78,8 @@ public class JavaHTTPServer implements Runnable{
 			// get first line of the request from the client
 			String input = in.readLine();
 			// we parse the request with a string tokenizer
-			StringTokenizer parse = new StringTokenizer(input);
+
+                        StringTokenizer parse = new StringTokenizer(input);
 			String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
 			// we get file requested
 			fileRequested = parse.nextToken().toLowerCase();
@@ -105,6 +110,7 @@ public class JavaHTTPServer implements Runnable{
 				dataOut.flush();
 				
 			} else {
+                            
 				// GET or HEAD method
 				if (fileRequested.endsWith("/")) {
 					fileRequested += DEFAULT_FILE;
@@ -138,16 +144,23 @@ public class JavaHTTPServer implements Runnable{
 			
 		} catch (FileNotFoundException fnfe) {
 			try {
-                            if("/ciccio".equals(fileRequested))
+                          
+                            if (fileRequested.endsWith("/")) 
                             {
-                                redirect(out);
+                                fileRequested+="/";
+                             redirect(out,fileRequested);
                             }
-                            else
+                           else
                             {
-                                fileNotFound(out, dataOut, fileRequested);
+                             fileNotFound(out, dataOut, fileRequested);
                             }
+                                
+                            
+                            
 				
 			} catch (IOException ioe) {
+                            
+                           
 				System.err.println("Error with file not found exception : " + ioe.getMessage());
 			}
 			
@@ -190,12 +203,15 @@ public class JavaHTTPServer implements Runnable{
 	private String getContentType(String fileRequested) {
 		if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html"))
 			return "text/html";
+                if(fileRequested.endsWith(".css"))
+                    return "text/css";
 		else
 			return "text/plain";
 	}
 	
 	private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException {
-		File file = new File(WEB_ROOT, FILE_NOT_FOUND);
+            a=false;	
+            File file = new File(WEB_ROOT, FILE_NOT_FOUND);
 		int fileLength = (int) file.length();
 		String content = "text/html";
 		byte[] fileData = readFileData(file, fileLength);
@@ -216,14 +232,18 @@ public class JavaHTTPServer implements Runnable{
 		}
 	}
 	
-          private void redirect(PrintWriter out)
+          private void redirect(PrintWriter out, String fileRequested)
         {
+           
+            String fileRedirected = fileRequested;
             out.println("HTTP/1.1 301 ");
-          out.println("Server: Java HTTP Server from SSaurel : 1.0");
+                out.println("Server: Java HTTP Server from SSaurel : 1.0");
           out.println("Date: " + new Date());
-                out.println("Location: /ciccio/");
+                out.println("Location: "+ fileRedirected);
             out.println(); // blank line between headers and content, very $
             out.flush(); // flush character output stream buffer
+            
+        
         }
 
 
