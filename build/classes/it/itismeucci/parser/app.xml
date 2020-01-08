@@ -2,5 +2,6 @@
 <app>
    
         <porta>8080</porta>
+        <redirect>false</redirect>
 
 </app>

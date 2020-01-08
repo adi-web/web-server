@@ -18,7 +18,9 @@ import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 // The tutorial can be found just here on the SSaurel's Blog : 
 // https://www.ssaurel.com/blog/create-a-simple-http-web-server-in-java
@@ -47,13 +49,19 @@ public class JavaHTTPServer implements Runnable{
             
             
             try { 
-                int a;
-                    AppConfigParser configParser = new AppConfigParser();
-           App config = configParser.parse("it/itismeucci/parser/app.xml");
-            System.out.println(config);
+                Marshall m= new Marshall("8080");
+                    ReadXml readxml= new ReadXml();
+                 
+                    JAXBContext jc = JAXBContext.newInstance(Marshall.class);
+
+			Marshaller marshaller = jc.createMarshaller();
+			//marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			//marshaller.marshal(m, System.out);
+                        System.out.println(marshaller);
+	
             
-			ServerSocket serverConnect = new ServerSocket(config.getPorta());
-			System.out.println("Server started.\nListening for connections on port : " + config.getPorta() + " ...\n");
+			ServerSocket serverConnect = new ServerSocket(readxml.config.getPorta());
+			System.out.println("Server started.\nListening for connections on port : " + readxml.config.getPorta() + " ...\n");
 			
 			// we listen until user halts server execution
 			while (true) {
